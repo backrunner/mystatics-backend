@@ -1,4 +1,4 @@
-package top.backrunner.installstat.util.filter;
+package top.backrunner.installstat.utils.filter;
 
 import java.util.ArrayList;
 import java.util.List;

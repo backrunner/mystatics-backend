@@ -28,9 +28,14 @@ spring:
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-    database-platform: org.hibernate.dialect.MySQL5Dialect
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
   profiles:
     active: dev
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 logging:
   file:
     path: ./logs

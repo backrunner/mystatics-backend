@@ -14,8 +14,6 @@ public interface BaseService<T> {
     Session getHibernateSession();
     // 获取一个数据库连接
     Connection getConnection();
-    // 获取模板
-    HibernateTemplate getTemplate();
     // 添加一个实体
     <T> boolean add(T entity);
     // 添加一个实体，返回主键
@@ -42,13 +40,10 @@ public interface BaseService<T> {
     <T> T getById(Class<T> clazz, Serializable id);
     // 根据HQL获取实体
     <T> T getByHql(String hql);
-    <T> List<T> getEntitiesByHql(String hql);
-    // 动态查询
-    <T> List<T> getEntities(Class<T> clazz);
-    // 批量查询
-    <T> List<T> getEntities(String hql, Object[] obj);
-    // 根据动态查询条件查询
-    <T> List<T> find(DetachedCriteria criteria);
+    // 根据SQL获取实体
+    <T> T getBySql(String sql);
+    // 获取实体列表
+    <T> T getEntityList(DetachedCriteria dc);
     // 分页查询
     <T> List<T> showPage(String hql, Page<T> page);
     <T> List<T> showPage(String hql, int currentPage, int pageSize);

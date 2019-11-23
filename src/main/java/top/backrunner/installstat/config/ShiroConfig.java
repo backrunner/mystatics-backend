@@ -1,8 +1,10 @@
 package top.backrunner.installstat.config;
 
-import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import net.sf.ehcache.CacheManager;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -12,14 +14,17 @@ import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import top.backrunner.installstat.config.shiro.OptionsRequestFilter;
+import top.backrunner.installstat.config.shiro.RetryLimitCredentialsMatcher;
 import top.backrunner.installstat.config.shiro.UserRealm;
 import top.backrunner.installstat.config.shiro.WebSessionManager;
 
 import javax.servlet.Filter;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,11 +33,6 @@ public class ShiroConfig {
     @Bean
     public Realm realm(){
         return new UserRealm();
-    }
-
-    @Bean
-    public CacheManager cacheManager(){
-        return new MemoryConstrainedCacheManager();
     }
 
     @Bean
@@ -46,19 +46,44 @@ public class ShiroConfig {
     public CookieRememberMeManager rememberMeManager(){
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
-        cookieRememberMeManager.setCipherKey(Base64.decode("MOTHERFUCKERKEY!".getBytes()));
+        cookieRememberMeManager.setCipherKey(Base64.decode("OHGODTHISISKEY!!".getBytes()));
         return cookieRememberMeManager;
     }
 
     @Bean
     public SessionManager sessionManager(){
-        return new WebSessionManager();
+        return new DefaultWebSessionManager();
+    }
+
+    @Bean
+    public EhCacheManager ehCacheManager() {
+        CacheManager cm = CacheManager.getCacheManager("es");
+        if (cm == null) {
+            try {
+                cm = CacheManager.create(ResourceUtils.getInputStreamForPath("classpath:shiro/ehcache.xml"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        EhCacheManager cacheManager = new EhCacheManager();
+        cacheManager.setCacheManager(cm);
+        return cacheManager;
+    }
+
+    @Bean
+    public CredentialsMatcher retryLimitCredentialsMatcher() {
+        RetryLimitCredentialsMatcher retryLimitCredentialsMatcher = new RetryLimitCredentialsMatcher(ehCacheManager());
+        retryLimitCredentialsMatcher.setHashAlgorithmName("SHA-256");
+        // 散列迭代32次
+        retryLimitCredentialsMatcher.setHashIterations(32);
+        return retryLimitCredentialsMatcher;
     }
 
     @Bean({"securityManager"})
     public SecurityManager securityManager() {
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(realm());
+        securityManager.setCacheManager(ehCacheManager());
         securityManager.setSessionManager(sessionManager());
         securityManager.setRememberMeManager(rememberMeManager());
         return securityManager;
@@ -72,14 +97,13 @@ public class ShiroConfig {
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
-        // 未认证的跳转
-        shiroFilter.setLoginUrl("/error/unauth");
-        shiroFilter.setUnauthorizedUrl("/error/unauth");
         // 配置不会被拦截的api
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/portal/**", "anon");
-        filterChainDefinitionMap.put("/error/**", "anon");
+        filterChainDefinitionMap.put("/captcha/**", "anon");
+        filterChainDefinitionMap.put("/druid/**", "anon");
         filterChainDefinitionMap.put("/admin/**", "roles[admin]");
+        // 对应的是user拦截器，支持rememberMe
         filterChainDefinitionMap.put("/**", "optionsRequestFilter");
         shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMap);
         // 自定义过滤器

@@ -9,12 +9,14 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.system.service.UserService;
 
 public class UserRealm extends AuthorizingRealm {
 
     @Autowired
+    @Lazy
     private UserService userService;
 
     @Override
@@ -42,13 +44,5 @@ public class UserRealm extends AuthorizingRealm {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public void setCredentialsMatcher(CredentialsMatcher credentialsMatcher) {
-        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
-        matcher.setHashAlgorithmName("SHA-256");
-        matcher.setHashIterations(1024);
-        super.setCredentialsMatcher(matcher);
     }
 }

@@ -1,5 +1,6 @@
 package top.backrunner.installstat.system.service.impl;
 
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,8 @@ import top.backrunner.installstat.utils.filter.SQLFilter;
 
 @Repository
 @Transactional
-public class UserSeriveImpl extends BaseServiceImpl<UserInfo> implements UserService {
+public class UserServiceImpl extends BaseServiceImpl<UserInfo> implements UserService {
+
     @Override
     public UserInfo findByUserName(String username) {
         return this.getByHql("FROM UserInfo WHERE username = '" + SQLFilter.filter(username) +"'");

@@ -34,4 +34,7 @@ build/
 mvnw
 mvnw.cmd
 
+*.log
+
 application-release.yml
+config.properties
