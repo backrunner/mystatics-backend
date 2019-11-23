@@ -13,8 +13,7 @@ public class RoleInfo extends CoreInfo implements Serializable {
     // 角色名称
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
-    @JoinColumn(name="users")
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.DETACH, orphanRemoval = false)
     private List<UserInfo> users = new ArrayList<UserInfo>();
 
     public String getName() {

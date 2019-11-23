@@ -22,12 +22,12 @@ public class UserInfo extends CoreEntityInfo implements Serializable {
     private boolean isEnabled;
 
     // 头像
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional=true)
     @JoinColumn(name = "avatar")
     private UserAvatarInfo avatar;
 
     // 角色
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH, optional=true)
     @JoinColumn(name = "role")
     private RoleInfo role;
 
