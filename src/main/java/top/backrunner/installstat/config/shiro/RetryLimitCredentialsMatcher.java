@@ -17,10 +17,6 @@ public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
     private int maxRetryNum = 10;
     private EhCacheManager shiroEhcacheManager;
 
-    public void setMaxRetryNum(int maxRetryNum) {
-        this.maxRetryNum = maxRetryNum;
-    }
-
     public RetryLimitCredentialsMatcher(EhCacheManager shiroEhcacheManager) {
         this.shiroEhcacheManager = shiroEhcacheManager;
     }
@@ -29,21 +25,23 @@ public class RetryLimitCredentialsMatcher extends HashedCredentialsMatcher {
     public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
         Cache<String, AtomicInteger> passwordRetryCache = shiroEhcacheManager.getCache("passwordRetryCache");
         String username = (String) token.getPrincipal();
-        //retry count + 1  
+        //retry count + 1
         AtomicInteger retryCount = passwordRetryCache.get(username);
         if (null == retryCount) {
             retryCount = new AtomicInteger(0);
             passwordRetryCache.put(username, retryCount);
         }
-        if (retryCount.incrementAndGet() > maxRetryNum) {
-            log.warn("用户[{}]在登录验证时失败验证超过{}次，帐号已被临时锁定", username, maxRetryNum);
-            throw new ExcessiveAttemptsException("登录失败超过10次，帐号将被锁定30分钟");
-        }
         boolean matches = super.doCredentialsMatch(token, info);
         if (matches) {
-            //clear retry data  
+            //clear retry data
             passwordRetryCache.remove(username);
+        } else {
+            if (retryCount.incrementAndGet() > maxRetryNum) {
+                log.warn("用户[{}]在登录验证时失败验证超过{}次，帐号已被临时锁定", username, maxRetryNum);
+                throw new ExcessiveAttemptsException("登录失败超过10次，帐号将被锁定30分钟");
+            }
+            passwordRetryCache.put(username, retryCount);
         }
         return matches;
     }
-} 
+}

@@ -1,8 +1,6 @@
 package top.backrunner.installstat.config.shiro;
 
 import org.apache.shiro.authc.*;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -11,13 +9,13 @@ import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import top.backrunner.installstat.system.entity.UserInfo;
-import top.backrunner.installstat.system.service.UserService;
+import top.backrunner.installstat.system.dao.UserDao;
 
 public class UserRealm extends AuthorizingRealm {
 
     @Autowired
     @Lazy
-    private UserService userService;
+    private UserDao userService;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
@@ -40,7 +38,7 @@ public class UserRealm extends AuthorizingRealm {
         UserInfo user = userService.findByUserName(username);
         if (user != null){
             ByteSource salt = ByteSource.Util.bytes(user.getSalt());
-            return new SimpleAuthenticationInfo(user, user.getPassword(), salt, this.getClass().getName());
+            return new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), salt, this.getName());
         } else {
             return null;
         }

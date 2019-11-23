@@ -9,16 +9,20 @@ import java.io.Serializable;
 @Table(name = "ms_user", uniqueConstraints = @UniqueConstraint(columnNames = {"username", "email", "phone"}))
 public class UserInfo extends CoreEntityInfo implements Serializable {
     // 登录的用户名
+    @Column(nullable = false)
     private String username;
     // 登录的密码
+    @Column(nullable = false)
     private String password;
     // 加密用盐
+    @Column(nullable = false)
     private String salt;
     // 邮箱
     private String email;
     // 电话
     private String phone;
     // 是否启用
+    @Column(nullable = false)
     private boolean isEnabled;
 
     // 头像

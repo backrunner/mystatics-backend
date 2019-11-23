@@ -1,15 +1,14 @@
-package top.backrunner.installstat.core.service;
+package top.backrunner.installstat.core.dao;
 
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 import top.backrunner.installstat.core.entity.Page;
 
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.List;
 
-public interface BaseService<T> {
+public interface BaseDao<T> {
     // 获取hibernate会话
     Session getHibernateSession();
     // 获取一个数据库连接

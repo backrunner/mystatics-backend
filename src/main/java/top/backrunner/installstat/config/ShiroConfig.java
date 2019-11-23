@@ -1,6 +1,7 @@
 package top.backrunner.installstat.config;
 
 import net.sf.ehcache.CacheManager;
+import org.apache.catalina.User;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.codec.Base64;
@@ -32,7 +33,9 @@ import java.util.Map;
 public class ShiroConfig {
     @Bean
     public Realm realm(){
-        return new UserRealm();
+        UserRealm realm = new UserRealm();
+        realm.setCredentialsMatcher(retryLimitCredentialsMatcher());
+        return realm;
     }
 
     @Bean
@@ -74,7 +77,6 @@ public class ShiroConfig {
     public CredentialsMatcher retryLimitCredentialsMatcher() {
         RetryLimitCredentialsMatcher retryLimitCredentialsMatcher = new RetryLimitCredentialsMatcher(ehCacheManager());
         retryLimitCredentialsMatcher.setHashAlgorithmName("SHA-256");
-        // 散列迭代32次
         retryLimitCredentialsMatcher.setHashIterations(32);
         return retryLimitCredentialsMatcher;
     }
@@ -97,6 +99,9 @@ public class ShiroConfig {
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
+        // 配置unauth跳转
+        shiroFilter.setLoginUrl("/error/unauth");
+        shiroFilter.setUnauthorizedUrl("/error/unauth");
         // 配置不会被拦截的api
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/portal/**", "anon");
