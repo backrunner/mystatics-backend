@@ -19,7 +19,7 @@ import top.backrunner.installstat.system.service.UserService;
 import top.backrunner.installstat.utils.common.R;
 
 @Controller
-@RequestMapping(value = "/portal", method = RequestMethod.POST)
+@RequestMapping(value = "/portal")
 public class PortalController {
     @Autowired
     private UserService userService;
@@ -29,7 +29,7 @@ public class PortalController {
     // patterns
     private final String usernameRule = "^\\w+$";
 
-    @RequestMapping(value = "/login")
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public R login(String username, String password, String recaptchaToken, Boolean rememberMe){
         if (!ObjectUtils.allNotNull(username, password, recaptchaToken)){
@@ -72,7 +72,7 @@ public class PortalController {
         }
     }
 
-    @RequestMapping(value = "/register")
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
     @ResponseBody
     public R register(String username, String password, String confirmPassword, String recaptchaToken){
         if (!ObjectUtils.allNotNull(username, password, confirmPassword, recaptchaToken)){
@@ -129,6 +129,17 @@ public class PortalController {
         if (subject.isAuthenticated()){
             subject.logout();
             return R.ok("登出成功");
+        } else {
+            return R.error("用户未登录");
+        }
+    }
+
+    @RequestMapping(value = "/check")
+    @ResponseBody
+    public R check(){
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated() || subject.isRemembered()){
+            return R.ok("用户已登录");
         } else {
             return R.error("用户未登录");
         }
