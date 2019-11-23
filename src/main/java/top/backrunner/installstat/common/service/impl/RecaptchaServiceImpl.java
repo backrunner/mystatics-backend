@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.backrunner.installstat.common.service.RecaptchaService;
 import top.backrunner.installstat.config.RecaptchaConfig;
+import top.backrunner.installstat.utils.network.HttpResult;
 import top.backrunner.installstat.utils.network.HttpUtils;
 
 import java.util.HashMap;
@@ -26,11 +27,22 @@ public class RecaptchaServiceImpl implements RecaptchaService {
         HashMap<String, Object> params = new HashMap<>();
         params.put("secret", recaptchaConfig.getSecret());
         params.put("response", token);
-        String verifyRes = HttpUtils.postJson(VERIFY_URL, params);
-        if (verifyRes == null){
+        HttpResult res = null;
+        try {
+            res = HttpUtils.doPost(VERIFY_URL, params);
+        } catch (Exception e) {
+            // post到api出现异常，返回false
+            e.printStackTrace();
             return false;
         }
-        JSONObject res = JSON.parseObject(verifyRes);
-        return (boolean)res.get("success");
+        // http不成功或者回复不正常，返回false
+        if (res.getCode() != 200){
+            return false;
+        }
+        if (res.getBody() == null){
+            return false;
+        }
+        JSONObject parsedObject = JSON.parseObject(res.getBody());
+        return (boolean)parsedObject.get("success");
     }
 }

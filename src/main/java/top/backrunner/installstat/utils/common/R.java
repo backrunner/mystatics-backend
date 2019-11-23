@@ -56,6 +56,14 @@ public class R {
         return r;
     }
 
+    public static R badRequest(){
+        return new R(400, "Bad Request");
+    }
+
+    public static R badRequest(String message){
+        return new R(400, message);
+    }
+
     public static R forbidden(){
         return new R(403, "Forbidden");
     }

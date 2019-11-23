@@ -8,7 +8,6 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +26,10 @@ public class PortalController {
 
     @RequestMapping(value = "/login")
     @ResponseBody
-    public R login(@RequestBody String username, @RequestBody String password, @RequestBody String recaptchaToken, @RequestBody Boolean rememberMe){
+    public R login(String username, String password, String recaptchaToken, Boolean rememberMe){
+        if (!ObjectUtils.allNotNull(username, password, recaptchaToken)){
+            return R.badRequest("提交的参数不完整");
+        }
         // 先验证reCaptcha的状态
         if (!recaptchaService.verify(recaptchaToken)){
             return R.error("未通过reCaptcha验证");
@@ -38,7 +40,7 @@ public class PortalController {
         }
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         // 设置 rememberMe
-        token.setRememberMe(rememberMe);
+        token.setRememberMe(rememberMe == null ? false : rememberMe);
         try {
             subject.login(token);
         } catch (UnknownAccountException uae){
@@ -58,7 +60,10 @@ public class PortalController {
     }
 
     @RequestMapping(value = "/register")
-    public R register(@RequestBody String username, @RequestBody String password, @RequestBody String confirmPassword, @RequestBody String recaptchaToken){
+    public R register(String username, String password, String confirmPassword, String recaptchaToken){
+        if (!ObjectUtils.allNotNull(username, password, confirmPassword, recaptchaToken)){
+            return R.badRequest("提交的参数不完整");
+        }
         // 判断用户名是否重复
         try {
             if (userService.usernameExisted(username)){

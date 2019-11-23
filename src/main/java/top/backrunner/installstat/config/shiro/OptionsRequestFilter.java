@@ -2,7 +2,6 @@ package top.backrunner.installstat.config.shiro;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.shiro.web.filter.authc.UserFilter;
-import sun.plugin2.message.JavaScriptBaseMessage;
 import top.backrunner.installstat.utils.common.R;
 
 import javax.servlet.ServletRequest;
