@@ -49,7 +49,7 @@ public class ShiroConfig {
     public CookieRememberMeManager rememberMeManager(){
         CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
         cookieRememberMeManager.setCookie(rememberMeCookie());
-        cookieRememberMeManager.setCipherKey(Base64.decode("OHGODTHISISKEY!!".getBytes()));
+        cookieRememberMeManager.setCipherKey("OHGODTHISISKEY!!".getBytes());
         return cookieRememberMeManager;
     }
 
