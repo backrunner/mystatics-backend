@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @MappedSuperclass
-public class CoreEntityInfo extends CoreInfo implements Serializable {
+public abstract class CoreEntityInfo extends CoreInfo implements Serializable {
     private Date createTime;
 
     public Date getCreateTime() {

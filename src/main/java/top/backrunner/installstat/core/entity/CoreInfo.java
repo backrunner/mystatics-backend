@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
-public class CoreInfo {
+public abstract class CoreInfo {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue
