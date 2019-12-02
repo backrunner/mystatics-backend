@@ -18,6 +18,35 @@ import java.util.Map;
 
 public class HttpUtils {
 
+    public static HttpResult doGet(String url) throws Exception {
+        HttpClient httpClient = HttpClients.createDefault();
+        // 声明URIBuilder
+        URIBuilder uriBuilder = new URIBuilder(url);
+
+        // 创建httpGet对象，相当于设置url请求地址
+        HttpGet httpGet = new HttpGet(uriBuilder.build());
+
+        // 使用HttpClient执行httpGet，相当于按回车，发起请求
+        CloseableHttpResponse response = null;
+        try {
+            response = (CloseableHttpResponse) httpClient.execute(httpGet);
+        } catch (IOException e) {
+            HttpResult httpResult = new HttpResult(404, "请求失败");
+            return httpResult;
+        }
+
+        HttpResult httpResult = new HttpResult();
+        // 解析数据封装HttpResult
+        if (response.getEntity() != null) {
+            httpResult.setCode(response.getStatusLine().getStatusCode());
+            httpResult.setBody(EntityUtils.toString(response.getEntity(),"UTF-8"));
+        } else {
+            httpResult.setCode(response.getStatusLine().getStatusCode());
+        }
+
+        return httpResult;
+    }
+
     public static HttpResult doGet(String url, Map<String, Object> map) throws Exception {
         HttpClient httpClient = HttpClients.createDefault();
         // 声明URIBuilder

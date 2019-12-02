@@ -6,7 +6,6 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,15 +13,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import top.backrunner.installstat.common.service.RecaptchaService;
 import top.backrunner.installstat.system.entity.RoleInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
+import top.backrunner.installstat.system.service.UserLogService;
 import top.backrunner.installstat.system.service.UserService;
 import top.backrunner.installstat.utils.common.R;
+import top.backrunner.installstat.utils.misc.GeoIPStringUtils;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping(value = "/portal")
 public class PortalController {
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
+    private UserLogService userLogService;
+    @Resource
     private RecaptchaService recaptchaService;
 
     // patterns
@@ -30,7 +36,7 @@ public class PortalController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
-    public R login(String username, String password, String recaptchaToken, Boolean rememberMe){
+    public R login(String username, String password, String recaptchaToken, Boolean rememberMe, HttpServletRequest req){
         if (!ObjectUtils.allNotNull(username, password, recaptchaToken)){
             return R.badRequest("提交的参数不完整");
         }
@@ -65,6 +71,8 @@ public class PortalController {
             return R.error("登录失败");
         }
         if (subject.isAuthenticated()){
+            UserInfo info = userService.findUserByUsername(username);
+            userLogService.createLoginLog(info.getId(), GeoIPStringUtils.getIPAddress(req));
             return R.ok("登录成功");
         } else {
             return R.error("登录失败");
@@ -94,7 +102,7 @@ public class PortalController {
         }
         // 判断用户名是否重复
         try {
-            if (userService.usernameExisted(username)){
+            if (userService.usernameExists(username)){
                 return R.error("用户名已存在");
             }
         } catch (Exception e) {

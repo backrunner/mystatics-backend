@@ -38,7 +38,7 @@ public class UserRealm extends AuthorizingRealm {
         UserInfo user = userService.findByUserName(username);
         if (user != null){
             ByteSource salt = ByteSource.Util.bytes(user.getSalt());
-            return new SimpleAuthenticationInfo(user.getUsername(), user.getPassword(), salt, this.getName());
+            return new SimpleAuthenticationInfo(user, user.getPassword(), salt, this.getName());
         } else {
             return null;
         }

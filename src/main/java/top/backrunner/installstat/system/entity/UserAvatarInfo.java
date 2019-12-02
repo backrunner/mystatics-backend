@@ -9,8 +9,7 @@ import java.io.Serializable;
 @Table(name = "ms_user_avatar")
 public class UserAvatarInfo extends CoreEntityInfo implements Serializable {
     // 头像对应的用户
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "parent")
+    @OneToOne(mappedBy = "avatar")
     private UserInfo parent;
     // 头像的文件路径
     private String fileUrl;

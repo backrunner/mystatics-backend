@@ -1,10 +1,8 @@
 package top.backrunner.installstat.config;
 
 import net.sf.ehcache.CacheManager;
-import org.apache.catalina.User;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.codec.Base64;
 import org.apache.shiro.io.ResourceUtils;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.SessionManager;
@@ -22,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import top.backrunner.installstat.config.shiro.OptionsRequestFilter;
 import top.backrunner.installstat.config.shiro.RetryLimitCredentialsMatcher;
 import top.backrunner.installstat.config.shiro.UserRealm;
-import top.backrunner.installstat.config.shiro.WebSessionManager;
 
 import javax.servlet.Filter;
 import java.io.IOException;

@@ -7,7 +7,10 @@ public interface UserService {
     // 用户
     public boolean addUser(UserInfo user);
     public UserInfo findUserByUsername(String username);
-    public boolean usernameExisted(String username);
+    public UserInfo findUserById(Long uid);
+    public boolean usernameExists(String username);
+    public boolean userExists(Long uid);
+    public boolean updateUser(UserInfo user);
     // 权限
     public RoleInfo findRoleByName(String name);
     public RoleInfo initRole(String name);
