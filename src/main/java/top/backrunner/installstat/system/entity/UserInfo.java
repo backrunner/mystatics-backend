@@ -24,16 +24,10 @@ public class UserInfo extends CoreEntityInfo implements Serializable {
     // 是否启用
     @Column(nullable = false)
     private boolean isEnabled;
-
     // 头像
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional=true)
-    @JoinColumn(name = "avatar")
-    private UserAvatarInfo avatar;
-
+    private Long avatarId;
     // 角色
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH, optional=true)
-    @JoinColumn(name = "role")
-    private RoleInfo role;
+    private Long roleId;
 
     public String getUsername() {
         return username;
@@ -75,27 +69,27 @@ public class UserInfo extends CoreEntityInfo implements Serializable {
         isEnabled = enabled;
     }
 
-    public UserAvatarInfo getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(UserAvatarInfo avatar) {
-        this.avatar = avatar;
-    }
-
-    public RoleInfo getRole() {
-        return role;
-    }
-
-    public void setRole(RoleInfo role) {
-        this.role = role;
-    }
-
     public String getSalt() {
         return salt;
     }
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public Long getAvatarId() {
+        return avatarId;
+    }
+
+    public void setAvatarId(Long avatarId) {
+        this.avatarId = avatarId;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
     }
 }

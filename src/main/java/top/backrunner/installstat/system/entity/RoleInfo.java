@@ -15,9 +15,6 @@ public class RoleInfo extends CoreInfo implements Serializable {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = CascadeType.DETACH, orphanRemoval = false)
-    private List<UserInfo> users = new ArrayList<UserInfo>();
-
     public RoleInfo(){
         // default
     }
@@ -32,13 +29,5 @@ public class RoleInfo extends CoreInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<UserInfo> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<UserInfo> users) {
-        this.users = users;
     }
 }

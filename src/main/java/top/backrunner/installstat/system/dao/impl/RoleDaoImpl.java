@@ -9,6 +9,11 @@ import top.backrunner.installstat.utils.filter.SQLFilter;
 @Repository
 public class RoleDaoImpl extends BaseDaoImpl<RoleInfo> implements RoleDao {
     @Override
+    public RoleInfo findById(Long id) {
+        return this.getById(RoleInfo.class, id);
+    }
+
+    @Override
     public RoleInfo findByName(String name) {
         return this.getByHql("FROM RoleInfo WHERE name='"+ SQLFilter.filter(name) +"'");
     }

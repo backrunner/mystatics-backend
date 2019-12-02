@@ -7,15 +7,15 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import top.backrunner.installstat.system.entity.RoleInfo;
+import top.backrunner.installstat.system.entity.UserAvatarInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
-import top.backrunner.installstat.system.entity.log.UserLoginLogInfo;
 import top.backrunner.installstat.system.service.UserLogService;
 import top.backrunner.installstat.system.service.UserService;
 import top.backrunner.installstat.utils.common.R;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
-import java.util.List;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -27,18 +27,46 @@ public class UserController {
     @Resource
     private UserLogService userLogService;
 
-    @RequestMapping(value = "fetchUserInfo")
+    private final String emailRegex = "^(\\w)+(\\.\\w+)*@(\\w)+((\\.\\w+)+)$";
+    private final String phoneRegex = "^1[3456789]\\d{9}$";
+
+    @RequestMapping(value = "/fetchUserInfo")
     @ResponseBody
     public R fetchUserInfo(){
         UserInfo info = (UserInfo) SecurityUtils.getSubject().getPrincipal();
-        //UserInfo info = userService.findUserByUsername(username);
         HashMap<String, Object> res = new HashMap<>();
         res.put("id", info.getId());
         res.put("username", info.getUsername());
         res.put("email", info.getEmail());
         res.put("phone", info.getPhone());
-        res.put("avatar", info.getAvatar());
+        UserAvatarInfo avatar = userService.findAvatarById(info.getAvatarId());
+        if (avatar == null) {
+            res.put("avatar", null);
+        } else {
+            res.put("avatar", avatar.getFileUrl());
+        }
+        RoleInfo role = userService.findRoleById(info.getRoleId());
+        res.put("role", role.getName());
         return R.ok(res);
+    }
+
+    @RequestMapping(value = "/changeBaseInfo")
+    @ResponseBody
+    public R changeBaseInfo(String newEmail, String newPhone){
+        if (!ObjectUtils.allNotNull(newEmail, newPhone)){
+            return R.badRequest("提交的参数不完整");
+        }
+        if (!newEmail.matches(emailRegex)){
+            return R.badRequest("请填写正确的邮箱地址");
+        }
+        if (!newPhone.matches(phoneRegex)){
+            return R.badRequest("请填写正确的手机号码");
+        }
+        UserInfo info = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        info.setEmail(newEmail);
+        info.setPhone(newPhone);
+        userService.updateUser(info);
+        return R.ok("保存成功");
     }
 
     @RequestMapping(value = "/changePassword")

@@ -41,11 +41,11 @@ public class PortalController {
             return R.badRequest("提交的参数不完整");
         }
         if (username.length() < 4 || username.length() > 40){
-            return R.error("用户名不能少于4个字符，不能超过40个字符");
+            return R.badRequest("用户名不能少于4个字符，不能超过40个字符");
         }
         // 用户名过滤
         if (!username.matches(usernameRule)){
-            return R.error("用户名只允许输入字母、数字、下划线");
+            return R.badRequest("用户名只允许输入字母、数字、下划线");
         }
         // 先验证reCaptcha的状态
         if (!recaptchaService.verify(recaptchaToken)){
@@ -61,9 +61,7 @@ public class PortalController {
         token.setRememberMe(rememberMe == null ? false : rememberMe);
         try {
             subject.login(token);
-        } catch (UnknownAccountException uae){
-            return R.error("用户名或密码不正确");
-        } catch (IncorrectCredentialsException ice){
+        } catch (UnknownAccountException | IncorrectCredentialsException uae){
             return R.error("用户名或密码不正确");
         } catch (ExcessiveAttemptsException eae){
             return R.error("登录失败错误次数过多，请15分钟后重试");
@@ -72,8 +70,13 @@ public class PortalController {
         }
         if (subject.isAuthenticated()){
             UserInfo info = userService.findUserByUsername(username);
-            userLogService.createLoginLog(info.getId(), GeoIPStringUtils.getIPAddress(req));
-            return R.ok("登录成功");
+            // 判断帐户是否可用
+            if (info.isEnabled()) {
+                userLogService.createLoginLog(info.getId(), GeoIPStringUtils.getIPAddress(req));
+                return R.ok("登录成功");
+            } else {
+                return R.error("该帐号已被停用");
+            }
         } else {
             return R.error("登录失败");
         }
@@ -87,18 +90,18 @@ public class PortalController {
         }
         // 对参数的长度进行校验
         if (username.length() < 4 || username.length() > 40){
-            return R.error("用户名不能少于4个字符，不能超过40个字符");
+            return R.badRequest("用户名不能少于4个字符，不能超过40个字符");
         }
         if (password.length() < 6){
-            return R.error("密码不得少于6个字符");
+            return R.badRequest("密码不得少于6个字符");
         }
         // 两次输入的密码进行核对
         if (!password.equals(confirmPassword)){
-            return R.error("两次输入的密码不一致");
+            return R.badRequest("两次输入的密码不一致");
         }
         // 用户名校验
         if (!username.matches(usernameRule)){
-            return R.error("用户名只允许使用字母、数字、下划线");
+            return R.badRequest("用户名只允许使用字母、数字、下划线");
         }
         // 判断用户名是否重复
         try {
@@ -119,7 +122,7 @@ public class PortalController {
         if (role == null){
             role = userService.initRole("user");
         }
-        user.setRole(role);
+        user.setRoleId(role.getId());
         // 默认都是启用的
         user.setEnabled(true);
         if (userService.addUser(user)){
