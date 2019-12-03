@@ -1,10 +1,10 @@
 package top.backrunner.installstat.app.controller;
 
-import javafx.application.Application;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import top.backrunner.installstat.app.entity.ApplicationInfo;
 import top.backrunner.installstat.utils.common.R;
 
 import java.util.List;
@@ -15,12 +15,13 @@ public class ApplicationController {
 
     @RequestMapping(value = "/getList")
     @ResponseBody
-    public List<Application> getList(){
+    public List<ApplicationInfo> getList(){
 
     }
 
     // 获取该用户的应用数量
     @RequestMapping(value = "/getCount")
+    @ResponseBody
     public R getCount(){
 
     }

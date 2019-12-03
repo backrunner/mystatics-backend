@@ -34,6 +34,9 @@ public class ApplicationInfo extends CoreEntityInfo implements Serializable {
     // App Key
     private String appKey;
 
+    // 是否可用
+    public boolean isEnabled;
+
     public long getUid() {
         return uid;
     }
@@ -112,5 +115,13 @@ public class ApplicationInfo extends CoreEntityInfo implements Serializable {
 
     public void setUninstallCount(long uninstallCount) {
         this.uninstallCount = uninstallCount;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 }

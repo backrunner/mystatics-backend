@@ -7,6 +7,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projection;
 import org.hibernate.internal.CriteriaImpl;
+import org.hibernate.query.Query;
 import org.springframework.orm.hibernate5.SessionFactoryUtils;
 import org.springframework.stereotype.Service;
 import top.backrunner.installstat.core.dao.BaseDao;
@@ -93,7 +94,9 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
     public List<T> showPage(String hql, Page page) {
         Session session = this.getHibernateSession();
         try {
-            return this.getHibernateSession().createQuery(hql).setFirstResult(page.getCurrentPage() * page.getPageSize()).setMaxResults(page.getPageSize()).list();
+            Query<T> query =  session.createQuery(hql);
+            query.setFirstResult((page.getCurrentPage()-1) * page.getPageSize()).setMaxResults(page.getPageSize()).list();
+            return query.list();
         } catch (Exception e){
             e.printStackTrace();
             return null;
@@ -102,8 +105,11 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
 
     @Override
     public List<T> showPage(String hql, int currentPage, int pageSize) {
+        Session session = this.getHibernateSession();
         try {
-            return  this.getHibernateSession().createQuery(hql).setFirstResult(currentPage * pageSize).setMaxResults(pageSize).list();
+            Query<T> query =  session.createQuery(hql);
+            query.setFirstResult((currentPage - 1) * pageSize).setMaxResults(pageSize);
+            return query.list();
         } catch (Exception e){
             e.printStackTrace();
             return null;
