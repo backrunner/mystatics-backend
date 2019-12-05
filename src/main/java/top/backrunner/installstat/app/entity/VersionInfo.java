@@ -15,15 +15,18 @@ public class VersionInfo extends CoreEntityInfo implements Serializable {
     @Column(nullable = false)
     private String version;
 
-    // 类型 如: win, linux, mac, android, ios, other
+    // 分支
     @Column(nullable = false)
-    private String platform;
+    private String branch;
 
     // 该版本的安装量
     private long installCount;
 
     // 该版本的卸载量
     private long uninstallCount;
+
+    // 是否可用
+    private boolean isEnabled;
 
     public Long getAppId() {
         return appId;
@@ -41,12 +44,12 @@ public class VersionInfo extends CoreEntityInfo implements Serializable {
         this.version = version;
     }
 
-    public String getPlatform() {
-        return platform;
+    public String getBranch() {
+        return branch;
     }
 
-    public void setPlatform(String platform) {
-        this.platform = platform;
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 
     public long getInstallCount() {
@@ -63,5 +66,13 @@ public class VersionInfo extends CoreEntityInfo implements Serializable {
 
     public void setUninstallCount(long uninstallCount) {
         this.uninstallCount = uninstallCount;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 }

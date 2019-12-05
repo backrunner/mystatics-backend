@@ -5,10 +5,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 @MappedSuperclass
-public abstract class CoreEntityInfo extends CoreInfo implements Serializable {
+public abstract class CoreLogInfo extends CoreInfo implements Serializable {
     private Date createTime;
-
-    private Date lastUpdateTime;
 
     public Date getCreateTime() {
         return createTime;
@@ -16,13 +14,5 @@ public abstract class CoreEntityInfo extends CoreInfo implements Serializable {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public Date getLastUpdateTime() {
-        return lastUpdateTime;
-    }
-
-    public void setLastUpdateTime(Date lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
     }
 }

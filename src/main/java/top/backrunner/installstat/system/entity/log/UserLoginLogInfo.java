@@ -1,6 +1,7 @@
 package top.backrunner.installstat.system.entity.log;
 
 import top.backrunner.installstat.core.entity.CoreEntityInfo;
+import top.backrunner.installstat.core.entity.CoreLogInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "ms_log_login")
-public class UserLoginLogInfo extends CoreEntityInfo implements Serializable {
+public class UserLoginLogInfo extends CoreLogInfo implements Serializable {
     // 用户的id
     private Long uid;
     // IP地址

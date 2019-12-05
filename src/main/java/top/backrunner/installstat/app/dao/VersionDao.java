@@ -1,4 +1,8 @@
 package top.backrunner.installstat.app.dao;
 
-public interface VersionDao {
+import top.backrunner.installstat.app.entity.VersionInfo;
+import top.backrunner.installstat.core.dao.BaseDao;
+
+public interface VersionDao extends BaseDao<VersionInfo> {
+    public VersionInfo getVersion(Long appId, String branch, String version);
 }

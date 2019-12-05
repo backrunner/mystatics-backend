@@ -14,6 +14,8 @@ public class UninstallLogInfo extends CoreEntityInfo implements Serializable {
     private String uuid;
     private String geo;
 
+    private boolean reinstallFlag;
+
     public Long getAppId() {
         return appId;
     }
@@ -44,5 +46,13 @@ public class UninstallLogInfo extends CoreEntityInfo implements Serializable {
 
     public void setGeo(String geo) {
         this.geo = geo;
+    }
+
+    public boolean isReinstallFlag() {
+        return reinstallFlag;
+    }
+
+    public void setReinstallFlag(boolean reinstallFlag) {
+        this.reinstallFlag = reinstallFlag;
     }
 }

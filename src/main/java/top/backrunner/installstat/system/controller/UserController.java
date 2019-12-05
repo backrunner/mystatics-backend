@@ -4,15 +4,18 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import top.backrunner.installstat.app.service.ApplicationService;
 import top.backrunner.installstat.system.entity.RoleInfo;
 import top.backrunner.installstat.system.entity.UserAvatarInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.system.service.UserLogService;
 import top.backrunner.installstat.system.service.UserService;
 import top.backrunner.installstat.utils.common.R;
+import top.backrunner.installstat.utils.security.AuthUtils;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -27,13 +30,16 @@ public class UserController {
     @Resource
     private UserLogService userLogService;
 
+    @Resource
+    private ApplicationService applicationService;
+
     private final String emailRegex = "^(\\w)+(\\.\\w+)*@(\\w)+((\\.\\w+)+)$";
     private final String phoneRegex = "^1[3456789]\\d{9}$";
 
     @RequestMapping(value = "/fetchUserInfo")
     @ResponseBody
     public R fetchUserInfo(){
-        UserInfo info = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        UserInfo info = AuthUtils.getUser();
         HashMap<String, Object> res = new HashMap<>();
         res.put("id", info.getId());
         res.put("username", info.getUsername());
@@ -62,7 +68,7 @@ public class UserController {
         if (!newPhone.matches(phoneRegex)){
             return R.badRequest("请填写正确的手机号码");
         }
-        UserInfo info = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        UserInfo info = AuthUtils.getUser();
         info.setEmail(newEmail);
         info.setPhone(newPhone);
         userService.updateUser(info);
@@ -106,7 +112,26 @@ public class UserController {
     @RequestMapping(value = "/listLoginLog")
     @ResponseBody
     public R listLoginLog(){
-        UserInfo info = (UserInfo) SecurityUtils.getSubject().getPrincipal();
+        UserInfo info = AuthUtils.getUser();
         return R.ok(userLogService.getLatestLoginLogs(info.getId(), 5));
+    }
+
+    @RequestMapping(value = "/cancelAccount")
+    @ResponseBody
+    public R cancelAccount(String password){
+        UserInfo user = AuthUtils.getUser();
+        String hashPassword = new SimpleHash("SHA-256", password, user.getSalt(), 32).toHex();
+        if (hashPassword.equals(user.getPassword())){
+            // 注销帐号
+            Subject subject = SecurityUtils.getSubject();
+            subject.logout();
+            if (applicationService.deleteApplicationByUser(user.getId()) && userService.deleteUser(user.getId())){
+                return R.ok("注销成功");
+            } else {
+                return R.error("注销失败");
+            }
+        } else {
+            return R.unauth("密码不正确");
+        }
     }
 }

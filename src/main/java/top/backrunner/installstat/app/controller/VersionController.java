@@ -12,15 +12,4 @@ import java.util.List;
 @RequestMapping(value = "/version")
 public class VersionController {
 
-    @RequestMapping(value = "/getList")
-    @ResponseBody
-    public List<VersionInfo> getList(){
-
-    }
-
-    @RequestMapping(value = "/delete")
-    @ResponseBody
-    public R deleteAction(){
-
-    }
 }

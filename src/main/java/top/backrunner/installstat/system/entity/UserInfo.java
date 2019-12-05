@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "ms_user", uniqueConstraints = @UniqueConstraint(columnNames = {"username", "email", "phone"}))
+@Table(name = "ms_user", uniqueConstraints = @UniqueConstraint(columnNames = {"username"}))
 public class UserInfo extends CoreEntityInfo implements Serializable {
     // 登录的用户名
     @Column(nullable = false)

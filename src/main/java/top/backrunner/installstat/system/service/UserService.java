@@ -4,6 +4,7 @@ import top.backrunner.installstat.system.entity.RoleInfo;
 import top.backrunner.installstat.system.entity.UserAvatarInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
 
@@ -23,5 +24,5 @@ public interface UserService {
     public RoleInfo initRole(String name);
     // 管理员管理
     public List<Map<String, Object>> getUserList(int pageSize, int page);
-    public boolean banUser(Long id);
+    public boolean banUser(Long id) throws EntityNotFoundException;
 }
