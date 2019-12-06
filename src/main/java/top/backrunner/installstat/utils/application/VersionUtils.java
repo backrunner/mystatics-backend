@@ -11,8 +11,8 @@ public class VersionUtils {
         if (!a.getBranch().equals(b.getBranch())){
             throw new BranchNotEqualException();
         }
-        String[] ver_a = a.getVersion().split(".");
-        String[] ver_b = b.getVersion().split(".");
+        String[] ver_a = a.getVersion().split("\\.");
+        String[] ver_b = b.getVersion().split("\\.");
         if (Integer.parseInt(ver_a[0]) > Integer.parseInt(ver_b[0])){
             return 1;
         } else {
@@ -32,8 +32,8 @@ public class VersionUtils {
         }
     }
     public static short compare(String a, String b){
-        String[] ver_a = a.split(".");
-        String[] ver_b = b.split(".");
+        String[] ver_a = a.split("\\.");
+        String[] ver_b = b.split("\\.");
         if (Integer.parseInt(ver_a[0]) > Integer.parseInt(ver_b[0])){
             return 1;
         } else {
@@ -66,7 +66,7 @@ public class VersionUtils {
             if (!branch.equals(v.getBranch())){
                 continue;
             }
-            String[] ver = v.getVersion().split(".");
+            String[] ver = v.getVersion().split("\\.");
             if (Integer.parseInt(ver[0]) > max_major){
                 max_major = Integer.parseInt(ver[0]);
                 maxVersion = v.getVersion();

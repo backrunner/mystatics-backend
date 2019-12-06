@@ -24,8 +24,6 @@ public class UserInfo extends CoreEntityInfo implements Serializable {
     // 是否启用
     @Column(nullable = false)
     private boolean isEnabled;
-    // 头像
-    private Long avatarId;
     // 角色
     private Long roleId;
 
@@ -75,14 +73,6 @@ public class UserInfo extends CoreEntityInfo implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
-    }
-
-    public Long getAvatarId() {
-        return avatarId;
-    }
-
-    public void setAvatarId(Long avatarId) {
-        this.avatarId = avatarId;
     }
 
     public Long getRoleId() {

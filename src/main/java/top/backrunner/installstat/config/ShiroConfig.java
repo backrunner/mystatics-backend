@@ -104,6 +104,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/portal/**", "anon");
         filterChainDefinitionMap.put("/captcha/**", "anon");
         filterChainDefinitionMap.put("/druid/**", "anon");
+        filterChainDefinitionMap.put("/submit/**", "anon");
         filterChainDefinitionMap.put("/admin/**", "roles[admin]");
         // 对应的是user拦截器，支持rememberMe
         filterChainDefinitionMap.put("/**", "optionsRequestFilter");

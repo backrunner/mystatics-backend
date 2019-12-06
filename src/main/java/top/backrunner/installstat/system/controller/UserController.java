@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.backrunner.installstat.app.service.ApplicationService;
 import top.backrunner.installstat.system.entity.RoleInfo;
-import top.backrunner.installstat.system.entity.UserAvatarInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.system.service.UserLogService;
 import top.backrunner.installstat.system.service.UserService;
@@ -45,12 +44,6 @@ public class UserController {
         res.put("username", info.getUsername());
         res.put("email", info.getEmail());
         res.put("phone", info.getPhone());
-        UserAvatarInfo avatar = userService.findAvatarById(info.getAvatarId());
-        if (avatar == null) {
-            res.put("avatar", null);
-        } else {
-            res.put("avatar", avatar.getFileUrl());
-        }
         RoleInfo role = userService.findRoleById(info.getRoleId());
         res.put("role", role.getName());
         return R.ok(res);

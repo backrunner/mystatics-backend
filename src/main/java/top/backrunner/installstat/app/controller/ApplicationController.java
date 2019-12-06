@@ -1,13 +1,12 @@
 package top.backrunner.installstat.app.controller;
 
-import org.apache.catalina.User;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.backrunner.installstat.app.entity.ApplicationInfo;
+import top.backrunner.installstat.app.entity.VersionInfo;
 import top.backrunner.installstat.app.service.ApplicationService;
-import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.utils.common.R;
 import top.backrunner.installstat.utils.security.AuthUtils;
 
@@ -95,6 +94,26 @@ public class ApplicationController {
         }
     }
 
+    @RequestMapping(value = "/deleteApp")
+    @ResponseBody
+    public R editApp(Long appId) {
+        if (!ObjectUtils.allNotNull(appId)) {
+            return R.badRequest("提交的参数不完整");
+        }
+        ApplicationInfo app = applicationService.fetchAppInfo(appId);
+        if (app == null){
+            return R.error("无该应用");
+        }
+        if (!AuthUtils.getUserId().equals(app.getUid())){
+            return R.unauth("无权操作");
+        }
+        if (applicationService.deleteApplication(appId)){
+            return R.ok("删除成功");
+        } else {
+            return R.error("删除失败");
+        }
+    }
+
     @RequestMapping(value = "/renewAppKey")
     @ResponseBody
     public R renewAppKey(Long appId){
@@ -114,5 +133,79 @@ public class ApplicationController {
         } else {
             return R.error("重置失败");
         }
+    }
+
+    @RequestMapping(value = "/fetchInfo")
+    @ResponseBody
+    public R fetchInfo(Long appId){
+        if (!ObjectUtils.allNotNull(appId)){
+            return R.badRequest("提交的参数不完整");
+        }
+        ApplicationInfo app = applicationService.fetchAppInfo(appId);
+        if (app == null){
+            return R.error("无该应用");
+        }
+        if (!AuthUtils.getUserId().equals(app.getUid())){
+            return R.unauth("无权操作");
+        }
+        return R.ok(app);
+    }
+
+    @RequestMapping(value = "/getVersionList")
+    @ResponseBody
+    public R getVersionList(Long appId, int currentPage, int pageSize){
+        if (!ObjectUtils.allNotNull(appId, currentPage, pageSize)){
+            return R.badRequest("提交的参数不完整");
+        }
+        ApplicationInfo app = applicationService.fetchAppInfo(appId);
+        if (app == null){
+            return R.error("无该应用");
+        }
+        if (!AuthUtils.getUserId().equals(app.getUid())){
+            return R.unauth("无权操作");
+        }
+        List<VersionInfo> list = applicationService.getVersionList(appId, currentPage, pageSize);
+        Long total = applicationService.countVersion(appId);
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("total", total);
+        response.put("list", list);
+        return R.ok(response);
+    }
+
+    @RequestMapping(value = "/deleteVersion")
+    @ResponseBody
+    public R deleteVersion(Long appId, Long versionId){
+        ApplicationInfo app = applicationService.fetchAppInfo(appId);
+        if (app == null){
+            return R.error("无该应用");
+        }
+        if (!AuthUtils.getUserId().equals(app.getUid())){
+            return R.unauth("无权操作");
+        }
+        VersionInfo version = applicationService.fetchVersion(versionId);
+        if (version == null) {
+            return R.error("无该版本");
+        }
+        if (!version.getAppId().equals(app.getId())){
+            return R.error("App与版本不匹配");
+        }
+        if (applicationService.deleteVersion(versionId)){
+            return R.ok("删除成功");
+        } else {
+            return R.error("删除失败");
+        }
+    }
+
+    @RequestMapping(value = "/monthInstallCount")
+    @ResponseBody
+    public R monthInstallCount(Long appId){
+        ApplicationInfo app = applicationService.fetchAppInfo(appId);
+        if (app == null){
+            return R.error("无该应用");
+        }
+        if (!AuthUtils.getUserId().equals(app.getUid())){
+            return R.unauth("无权操作");
+        }
+        return R.ok(applicationService.getMonthInstallCount(appId));
     }
 }

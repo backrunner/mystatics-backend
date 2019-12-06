@@ -1,0 +1,4 @@
+package top.backrunner.installstat.app.exception;
+
+public class VersionNotFoundException extends Exception {
+}

@@ -17,4 +17,9 @@ public class RoleDaoImpl extends BaseDaoImpl<RoleInfo> implements RoleDao {
     public RoleInfo findByName(String name) {
         return this.getByHql("FROM RoleInfo WHERE name='"+ SQLFilter.filter(name) +"'");
     }
+
+    @Override
+    public boolean exists(String name) {
+        return this.countByHql("select count(*) from RoleInfo where name='"+ SQLFilter.filter(name) +"'") > 0;
+    }
 }

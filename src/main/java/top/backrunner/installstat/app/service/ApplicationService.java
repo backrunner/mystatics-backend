@@ -4,11 +4,15 @@ import top.backrunner.installstat.app.entity.ApplicationInfo;
 import top.backrunner.installstat.app.entity.InstallLogInfo;
 import top.backrunner.installstat.app.entity.UninstallLogInfo;
 import top.backrunner.installstat.app.entity.VersionInfo;
+import top.backrunner.installstat.app.exception.ApplicationNotFoundException;
+import top.backrunner.installstat.app.exception.NoAuthorityException;
 import top.backrunner.installstat.app.exception.UninstallCountStatDisabledException;
+import top.backrunner.installstat.app.exception.VersionNotFoundException;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 public interface ApplicationService {
     // Application
@@ -24,21 +28,24 @@ public interface ApplicationService {
     public ApplicationInfo getAppInfoByKey(String appKey);  // 根据 AppKey 获取 AppInfo
     public boolean bundleIdExists(String bundleId);
     // Version
+    public VersionInfo fetchVersion(Long versionId);
     public List<VersionInfo> getVersionList(Long appId);
-    public List<VersionInfo> getVersionList(Long appId, int pageSize, int page);
+    public List<VersionInfo> getVersionList(Long appId, int page, int pageSize);
     public boolean addVersion(VersionInfo info);
     public boolean deleteVersion(Long versionId);
     public void deleteVersionByUser(Long uid);
     public boolean deleteVersionByApplication(Long appId);
+    public long countVersion(Long appId);
     public boolean truncateApplication(Long appId);
     // Stat
-    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws EntityExistsException, EntityNotFoundException;
-    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, EntityExistsException, EntityNotFoundException;
+    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws ApplicationNotFoundException;
+    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException;
     public long getRecentWeekInstallCount(Long uid);
     public long getRecentWeekUninstallCount(Long uid);
+    public List<Map<String, Object>> getMonthInstallCount(Long appId);
     // Admin
-    public List<ApplicationInfo> getAllApplicationList(int pageSize, int page);
-    public List<VersionInfo> getAllVersionList(int pageSize, int page);
+    public List<ApplicationInfo> getAllApplicationList(int page, int pageSize);
+    public List<VersionInfo> getAllVersionList(int page, int pageSize);
     public boolean banApp(Long appId) throws EntityNotFoundException;
 
     // 创建统计记录

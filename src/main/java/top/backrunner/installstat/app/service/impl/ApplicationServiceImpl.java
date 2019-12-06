@@ -1,5 +1,6 @@
 package top.backrunner.installstat.app.service.impl;
 
+import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 import top.backrunner.installstat.app.dao.ApplicationDao;
 import top.backrunner.installstat.app.dao.InstallLogDao;
@@ -9,7 +10,10 @@ import top.backrunner.installstat.app.entity.ApplicationInfo;
 import top.backrunner.installstat.app.entity.InstallLogInfo;
 import top.backrunner.installstat.app.entity.UninstallLogInfo;
 import top.backrunner.installstat.app.entity.VersionInfo;
+import top.backrunner.installstat.app.exception.ApplicationNotFoundException;
+import top.backrunner.installstat.app.exception.NoAuthorityException;
 import top.backrunner.installstat.app.exception.UninstallCountStatDisabledException;
+import top.backrunner.installstat.app.exception.VersionNotFoundException;
 import top.backrunner.installstat.app.service.ApplicationService;
 import top.backrunner.installstat.utils.application.VersionUtils;
 import top.backrunner.installstat.utils.common.UUIDUtils;
@@ -19,12 +23,9 @@ import top.backrunner.installstat.utils.security.AuthUtils;
 import top.backrunner.installstat.utils.security.HashUtils;
 
 import javax.annotation.Resource;
-import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -123,12 +124,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public VersionInfo fetchVersion(Long versionId) {
+        return versionDao.getById(VersionInfo.class, versionId);
+    }
+
+    @Override
     public List<VersionInfo> getVersionList(Long appId) {
         return versionDao.findByHql("FROM VersionInfo WHERE appId = "+appId);
     }
 
     @Override
-    public List<VersionInfo> getVersionList(Long appId, int pageSize, int page) {
+    public List<VersionInfo> getVersionList(Long appId, int page, int pageSize) {
         return versionDao.showPage("FROM VersionInfo WHERE appId = "+appId, page, pageSize);
     }
 
@@ -198,14 +204,20 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws EntityExistsException, EntityNotFoundException{
+    public long countVersion(Long appId) {
+        return versionDao.getCount(appId);
+    }
+
+    @Override
+    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws ApplicationNotFoundException {
         ApplicationInfo appInfo = applicationDao.getByAppKey(appKey);
         if (appInfo == null){
-            throw new EntityNotFoundException("找不到对应的应用");
+            throw new ApplicationNotFoundException();
         }
         long appId = appInfo.getId();
         VersionInfo v = versionDao.getVersion(appId, branch, version);
         if (v == null){
+            v = new VersionInfo();
             // 版本不存在
             v.setAppId(appId);
             v.setVersion(version);
@@ -273,17 +285,17 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, EntityExistsException, EntityNotFoundException {
+    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException {
         ApplicationInfo appInfo = applicationDao.getByAppKey(appKey);
         if (appInfo == null){
-            throw new EntityNotFoundException("找不到对应的应用");
+            throw new ApplicationNotFoundException();
         }
         if (!appInfo.isStatUninstall()){
             throw new UninstallCountStatDisabledException();
         }
         VersionInfo v = versionDao.getVersion(appInfo.getId(), branch, version);
         if (v == null){
-            throw new EntityNotFoundException("找不到对应的版本");
+            throw new VersionNotFoundException();
         }
         // 存在对应应用和对应版本
         appInfo.setUninstallCount(appInfo.getUninstallCount() + 1);
@@ -301,6 +313,19 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public long getRecentWeekUninstallCount(Long uid) {
         return uninstallLogDao.getRecentWeekCount(uid);
+    }
+
+    @Override
+    public List<Map<String, Object>> getMonthInstallCount(Long appId) {
+        List<Map> monthRes = installLogDao.getMonthCount(appId);
+        List<Map<String, Object>> res = new ArrayList<>();
+        for (Map map : monthRes){
+            Map<String, Object> resMap = new HashMap<>();
+            resMap.put("date", map.get("y").toString()+"-"+map.get("m").toString()+"-"+map.get("d").toString());
+            resMap.put("installCount", map.get("installCount"));
+            res.add(resMap);
+        }
+        return res;
     }
 
     @Override

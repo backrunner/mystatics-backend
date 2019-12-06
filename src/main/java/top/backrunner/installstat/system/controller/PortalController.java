@@ -119,9 +119,6 @@ public class PortalController {
         user.setSalt(salt);
         // 注册默认都是普通用户
         RoleInfo role = userService.findRoleByName("user");
-        if (role == null){
-            role = userService.initRole("user");
-        }
         user.setRoleId(role.getId());
         // 默认都是启用的
         user.setEnabled(true);

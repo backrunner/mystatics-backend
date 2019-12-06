@@ -1,13 +1,9 @@
 package top.backrunner.installstat.system.service.impl;
 
-import org.apache.catalina.User;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import top.backrunner.installstat.system.dao.RoleDao;
-import top.backrunner.installstat.system.dao.UserAvatarDao;
 import top.backrunner.installstat.system.dao.UserDao;
 import top.backrunner.installstat.system.entity.RoleInfo;
-import top.backrunner.installstat.system.entity.UserAvatarInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.system.service.UserService;
 
@@ -24,8 +20,6 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     @Resource
     private RoleDao roleDao;
-    @Resource
-    private UserAvatarDao userAvatarDao;
 
     @Override
     public boolean addUser(UserInfo user) {
@@ -71,14 +65,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserAvatarInfo findAvatarById(Long id) {
-        if (id == null){
-            return null;
-        }
-        return userAvatarDao.getById(UserAvatarInfo.class, id);
-    }
-
-    @Override
     public boolean deleteUser(Long id) {
         return userDao.removeByHql("DELETE FROM UserInfo WHERE id = "+id);
     }
@@ -100,6 +86,11 @@ public class UserServiceImpl implements UserService {
             return roleDao.findByName(name);
         }
         return null;
+    }
+
+    @Override
+    public boolean roleExists(String name) {
+        return roleDao.exists(name);
     }
 
     @Override

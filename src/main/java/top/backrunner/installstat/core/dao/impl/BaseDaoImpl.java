@@ -139,7 +139,7 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
     @Override
     public long executeHql(String hql) {
         try {
-            return this.getHibernateSession().createSQLQuery(hql).executeUpdate();
+            return this.getHibernateSession().createQuery(hql).executeUpdate();
         } catch (Exception e){
             e.printStackTrace();
             return -1;

@@ -49,7 +49,7 @@ public class UninstallLogDaoImpl extends BaseDaoImpl<UninstallLogInfo> implement
     @Override
     public long updateReinstall(Long appId, Long vid, String uuid) {
         Session session = this.getHibernateSession();
-        Query query = session.createQuery("update UninstallLogInfo set UninstallLogInfo.reinstallFlag = true where appId = :appId and versionId = :versionId and uuid = :uuid and reinstallFlag = false");
+        Query query = session.createQuery("update UninstallLogInfo set reinstallFlag = true where appId = :appId and versionId = :versionId and uuid = :uuid and reinstallFlag = false");
         query.setParameter("appId", appId);
         query.setParameter("versionId", vid);
         query.setParameter("uuid", uuid);
