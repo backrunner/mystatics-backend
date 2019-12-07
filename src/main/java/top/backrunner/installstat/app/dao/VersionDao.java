@@ -6,4 +6,5 @@ import top.backrunner.installstat.core.dao.BaseDao;
 public interface VersionDao extends BaseDao<VersionInfo> {
     public VersionInfo getVersion(Long appId, String branch, String version);
     public long getCount(Long appId);
+    public long getCountByUser(Long userId);
 }

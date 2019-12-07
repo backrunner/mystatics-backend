@@ -12,16 +12,15 @@ import top.backrunner.installstat.system.dao.RoleDao;
 import top.backrunner.installstat.system.entity.RoleInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.system.dao.UserDao;
+import top.backrunner.installstat.system.service.UserService;
+
+import javax.annotation.Resource;
 
 public class UserRealm extends AuthorizingRealm {
 
-    @Autowired
+    @Resource
     @Lazy
-    private UserDao userDao;
-
-    @Autowired
-    @Lazy
-    private RoleDao roleDao;
+    private UserService userService;
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
@@ -30,8 +29,8 @@ public class UserRealm extends AuthorizingRealm {
         // 定义返回的info
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         // 查询数据库
-        user = userDao.findByUserName(user.getUsername());
-        RoleInfo role = roleDao.getById(RoleInfo.class, user.getRoleId());
+        user = userService.findUserByUsername(user.getUsername());
+        RoleInfo role = userService.findRoleById(user.getRoleId());
         info.addRole(role.getName());
         return info;
     }
@@ -42,7 +41,7 @@ public class UserRealm extends AuthorizingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authenticationToken;
         String username = token.getUsername();
         // 查询数据库
-        UserInfo user = userDao.findByUserName(username);
+        UserInfo user = userService.findUserByUsername(username);
         if (user != null){
             ByteSource salt = ByteSource.Util.bytes(user.getSalt());
             return new SimpleAuthenticationInfo(user, user.getPassword(), salt, this.getName());

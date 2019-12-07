@@ -28,4 +28,13 @@ public class VersionDaoImpl extends BaseDaoImpl<VersionInfo> implements VersionD
         query.setParameter("appId", appId);
         return (Long)query.uniqueResult();
     }
+
+    @Override
+    public long getCountByUser(Long userId) {
+        Session session = this.getHibernateSession();
+        Query query = session.createQuery("select count(*) from VersionInfo v inner join ApplicationInfo a on v.appId = a.id where a.uid = :uid");
+        query.setParameter("uid", userId);
+        query.setMaxResults(1);
+        return (Long)query.uniqueResult();
+    }
 }

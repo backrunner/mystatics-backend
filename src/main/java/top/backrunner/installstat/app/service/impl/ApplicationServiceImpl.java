@@ -11,7 +11,6 @@ import top.backrunner.installstat.app.entity.InstallLogInfo;
 import top.backrunner.installstat.app.entity.UninstallLogInfo;
 import top.backrunner.installstat.app.entity.VersionInfo;
 import top.backrunner.installstat.app.exception.ApplicationNotFoundException;
-import top.backrunner.installstat.app.exception.NoAuthorityException;
 import top.backrunner.installstat.app.exception.UninstallCountStatDisabledException;
 import top.backrunner.installstat.app.exception.VersionNotFoundException;
 import top.backrunner.installstat.app.service.ApplicationService;
@@ -46,6 +45,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<ApplicationInfo> getApplicationList(long uid) {
         return applicationDao.findByHql("FROM ApplicationInfo WHERE uid = "+uid);
+    }
+
+    @Override
+    public List<ApplicationInfo> getApplicationList(long uid, int page, int pageSize) {
+        return applicationDao.showPage("FROM ApplicationInfo WHERE uid = "+uid, page, pageSize);
     }
 
     @Override
@@ -124,6 +128,20 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public List<Map<String, Object>> getAppStatData(Long uid) {
+        List<Map<String, Object>> res = new ArrayList<>();
+        List<ApplicationInfo> appList = applicationDao.getRecentApps(uid);
+        for (ApplicationInfo app : appList){
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", app.getDisplayName());
+            map.put("installCount", app.getInstallCount());
+            map.put("uninstallCount", app.getUninstallCount());
+            res.add(map);
+        }
+        return res;
+    }
+
+    @Override
     public VersionInfo fetchVersion(Long versionId) {
         return versionDao.getById(VersionInfo.class, versionId);
     }
@@ -135,7 +153,12 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<VersionInfo> getVersionList(Long appId, int page, int pageSize) {
-        return versionDao.showPage("FROM VersionInfo WHERE appId = "+appId, page, pageSize);
+        return versionDao.showPage("FROM VersionInfo WHERE appId = "+appId+" order by createTime desc", page, pageSize);
+    }
+
+    @Override
+    public long getVersionCount(Long uid) {
+        return versionDao.getCountByUser(uid);
     }
 
     @Override
@@ -316,14 +339,63 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<Map<String, Object>> getMonthInstallCount(Long appId) {
+    public long getInstallCount(Long uid) {
+        return installLogDao.getTotalCount(uid);
+    }
+
+    @Override
+    public long getUninstallCount(Long uid) {
+        return uninstallLogDao.getTotalCount(uid);
+    }
+
+    @Override
+    public Map<String, Object> getMonthInstallCount(Long appId) {
         List<Map> monthRes = installLogDao.getMonthCount(appId);
-        List<Map<String, Object>> res = new ArrayList<>();
+        Map<String, Object> res = new HashMap<>();
         for (Map map : monthRes){
-            Map<String, Object> resMap = new HashMap<>();
-            resMap.put("date", map.get("y").toString()+"-"+map.get("m").toString()+"-"+map.get("d").toString());
-            resMap.put("installCount", map.get("installCount"));
-            res.add(resMap);
+            res.put(map.get("y").toString()+"-"+map.get("m").toString()+"-"+map.get("d").toString(), map.get("installCount"));
+        }
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getMonthInstallCountByUser(Long uid) {
+        List<Map> monthRes = installLogDao.getMonthCountByUser(uid);
+        Map<String, Object> res = new HashMap<>();
+        for (Map map : monthRes){
+            res.put(map.get("y").toString()+"-"+map.get("m").toString()+"-"+map.get("d").toString(), map.get("installCount"));
+        }
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getMonthUninstallCountByUser(Long uid) {
+        List<Map> monthRes = uninstallLogDao.getMonthCountByUser(uid);
+        Map<String, Object> res = new HashMap<>();
+        for (Map map : monthRes){
+            res.put(map.get("y").toString()+"-"+map.get("m").toString()+"-"+map.get("d").toString(), map.get("uninstallCount"));
+        }
+        return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> getReport(Long uid, int page, int pageSize) {
+        List<ApplicationInfo> apps = this.getApplicationList(uid);
+        if (apps.isEmpty()){
+            return null;
+        }
+        List<Map<String, Object>> res = new ArrayList<>();
+        for (ApplicationInfo app : apps){
+            Map<String, Object> map = new HashMap<>();
+            map.put("bundleId", app.getBundleId());
+            map.put("name", app.getDisplayName());
+            map.put("installCount", app.getInstallCount());
+            map.put("uninstallCount", app.getUninstallCount());
+            map.put("weekInstallCount", installLogDao.getAppRecentWeekCount(app.getId()));
+            map.put("weekUninstallCount", uninstallLogDao.getAppRecentWeekCount(app.getId()));
+            map.put("monthInstallCount", installLogDao.getAppMonthCount(app.getId()));
+            map.put("monthUninstallCount", uninstallLogDao.getAppMonthCount(app.getId()));
+            res.add(map);
         }
         return res;
     }

@@ -17,6 +17,7 @@ import java.util.Map;
 public interface ApplicationService {
     // Application
     public List<ApplicationInfo> getApplicationList(long uid);
+    public List<ApplicationInfo> getApplicationList(long uid, int page, int pageSize);
     public long getApplicationCount(Long uid);
     public ApplicationInfo fetchAppInfo(Long appId);
     public boolean addApplication(ApplicationInfo application);
@@ -27,10 +28,12 @@ public interface ApplicationService {
     public String renewAppKey(ApplicationInfo app);
     public ApplicationInfo getAppInfoByKey(String appKey);  // 根据 AppKey 获取 AppInfo
     public boolean bundleIdExists(String bundleId);
+    public List<Map<String, Object>> getAppStatData(Long uid);
     // Version
     public VersionInfo fetchVersion(Long versionId);
     public List<VersionInfo> getVersionList(Long appId);
     public List<VersionInfo> getVersionList(Long appId, int page, int pageSize);
+    public long getVersionCount(Long uid);
     public boolean addVersion(VersionInfo info);
     public boolean deleteVersion(Long versionId);
     public void deleteVersionByUser(Long uid);
@@ -42,7 +45,13 @@ public interface ApplicationService {
     public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException;
     public long getRecentWeekInstallCount(Long uid);
     public long getRecentWeekUninstallCount(Long uid);
-    public List<Map<String, Object>> getMonthInstallCount(Long appId);
+    public long getInstallCount(Long uid);
+    public long getUninstallCount(Long uid);
+    public Map<String, Object> getMonthInstallCount(Long appId);
+    public Map<String, Object> getMonthInstallCountByUser(Long uid);
+    public Map<String, Object> getMonthUninstallCountByUser(Long uid);
+    // Report
+    public List<Map<String, Object>> getReport(Long uid, int page, int pageSize);
     // Admin
     public List<ApplicationInfo> getAllApplicationList(int page, int pageSize);
     public List<VersionInfo> getAllVersionList(int page, int pageSize);

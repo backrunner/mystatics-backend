@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import top.backrunner.installstat.app.entity.ApplicationInfo;
 import top.backrunner.installstat.app.entity.VersionInfo;
 import top.backrunner.installstat.app.service.ApplicationService;
+import top.backrunner.installstat.system.entity.AnnouncementInfo;
+import top.backrunner.installstat.system.service.SystemService;
 import top.backrunner.installstat.utils.common.R;
 import top.backrunner.installstat.utils.security.AuthUtils;
 
@@ -21,6 +23,9 @@ public class ApplicationController {
 
     @Resource
     private ApplicationService applicationService;
+
+    @Resource
+    private SystemService systemService;
 
     @RequestMapping(value = "/userOverview")
     @ResponseBody
@@ -175,6 +180,9 @@ public class ApplicationController {
     @RequestMapping(value = "/deleteVersion")
     @ResponseBody
     public R deleteVersion(Long appId, Long versionId){
+        if (!ObjectUtils.allNotNull(appId, versionId)){
+            return R.badRequest("提交的参数不完整");
+        }
         ApplicationInfo app = applicationService.fetchAppInfo(appId);
         if (app == null){
             return R.error("无该应用");
@@ -199,6 +207,9 @@ public class ApplicationController {
     @RequestMapping(value = "/monthInstallCount")
     @ResponseBody
     public R monthInstallCount(Long appId){
+        if (!ObjectUtils.allNotNull(appId)){
+            return R.badRequest("提交的参数不完整");
+        }
         ApplicationInfo app = applicationService.fetchAppInfo(appId);
         if (app == null){
             return R.error("无该应用");
@@ -207,5 +218,65 @@ public class ApplicationController {
             return R.unauth("无权操作");
         }
         return R.ok(applicationService.getMonthInstallCount(appId));
+    }
+
+    @RequestMapping(value = "/getLatestAnnouncement")
+    @ResponseBody
+    public R getLatestAnnouncement(){
+        AnnouncementInfo info = systemService.getLatestAnnouncement();
+        if (info == null){
+            return R.error("无公告");
+        } else {
+            return R.ok(info);
+        }
+    }
+
+    @RequestMapping(value = "/getDashboardOverview")
+    @ResponseBody
+    public R getDashboardOverview(){
+        Map<String, Object> result = new HashMap<>();
+        long uid = AuthUtils.getUserId();
+        result.put("appCount", applicationService.getApplicationCount(uid));
+        result.put("versionCount", applicationService.getVersionCount(uid));
+        result.put("installCount", applicationService.getInstallCount(uid));
+        result.put("uninstallCount", applicationService.getUninstallCount(uid));
+        return R.ok(result);
+    }
+
+    @RequestMapping(value = "/getAppStatData")
+    @ResponseBody
+    public R getAppStatData(){
+        List<Map<String, Object>> list = applicationService.getAppStatData(AuthUtils.getUserId());
+        if (list.isEmpty()){
+            return R.error("无数据");
+        } else {
+            return R.ok(list);
+        }
+    }
+
+    @RequestMapping(value = "/getIncreaseData")
+    @ResponseBody
+    public R getIncreaseData() {
+        Map<String, Object> result = new HashMap<>();
+        result.put("install", applicationService.getMonthInstallCountByUser(AuthUtils.getUserId()));
+        result.put("uninstall", applicationService.getMonthUninstallCountByUser(AuthUtils.getUserId()));
+        return R.ok(result);
+    }
+
+    @RequestMapping(value = "/getReport")
+    @ResponseBody
+    public R getReport(int page, int pageSize){
+        if (!ObjectUtils.allNotNull(page, pageSize)){
+            return R.badRequest("提交的参数不完整");
+        }
+        List<Map<String, Object>> res = applicationService.getReport(AuthUtils.getUserId(), page, pageSize);
+        if (res.isEmpty()){
+            return R.error("无结果");
+        } else {
+            Map<String, Object> data = new HashMap<>();
+            data.put("total", applicationService.getApplicationCount(AuthUtils.getUserId()));
+            data.put("listData", res);
+            return R.ok(data);
+        }
     }
 }
