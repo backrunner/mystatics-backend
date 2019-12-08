@@ -88,6 +88,9 @@ public class ApplicationController {
         if (!AuthUtils.getUserId().equals(app.getUid())){
             return R.unauth("无权操作");
         }
+        if (!app.isEnabled()){
+            return R.error("该应用不可用，无法操作");
+        }
         app.setDisplayName(name);
         app.setDescription(desc);
         app.setWebsite(website);
@@ -112,6 +115,9 @@ public class ApplicationController {
         if (!AuthUtils.getUserId().equals(app.getUid())){
             return R.unauth("无权操作");
         }
+        if (!app.isEnabled()){
+            return R.error("该应用不可用，无法操作");
+        }
         if (applicationService.deleteApplication(appId)){
             return R.ok("删除成功");
         } else {
@@ -131,6 +137,9 @@ public class ApplicationController {
         }
         if (!AuthUtils.getUserId().equals(app.getUid())){
             return R.unauth("无权操作");
+        }
+        if (!app.isEnabled()){
+            return R.error("该应用不可用，无法操作");
         }
         String newKey = applicationService.renewAppKey(app);
         if (newKey != null){
@@ -189,6 +198,9 @@ public class ApplicationController {
         }
         if (!AuthUtils.getUserId().equals(app.getUid())){
             return R.unauth("无权操作");
+        }
+        if (!app.isEnabled()){
+            return R.error("该应用不可用，无法操作");
         }
         VersionInfo version = applicationService.fetchVersion(versionId);
         if (version == null) {

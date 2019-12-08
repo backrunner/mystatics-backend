@@ -4,10 +4,7 @@ import top.backrunner.installstat.app.entity.ApplicationInfo;
 import top.backrunner.installstat.app.entity.InstallLogInfo;
 import top.backrunner.installstat.app.entity.UninstallLogInfo;
 import top.backrunner.installstat.app.entity.VersionInfo;
-import top.backrunner.installstat.app.exception.ApplicationNotFoundException;
-import top.backrunner.installstat.app.exception.NoAuthorityException;
-import top.backrunner.installstat.app.exception.UninstallCountStatDisabledException;
-import top.backrunner.installstat.app.exception.VersionNotFoundException;
+import top.backrunner.installstat.app.exception.*;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -18,6 +15,7 @@ public interface ApplicationService {
     // Application
     public List<ApplicationInfo> getApplicationList(long uid);
     public List<ApplicationInfo> getApplicationList(long uid, int page, int pageSize);
+    public long getApplicationCount();
     public long getApplicationCount(Long uid);
     public ApplicationInfo fetchAppInfo(Long appId);
     public boolean addApplication(ApplicationInfo application);
@@ -41,8 +39,8 @@ public interface ApplicationService {
     public long countVersion(Long appId);
     public boolean truncateApplication(Long appId);
     // Stat
-    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws ApplicationNotFoundException;
-    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException;
+    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws ApplicationNotFoundException, CannotAccessAppException;
+    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException, CannotAccessAppException;
     public long getRecentWeekInstallCount(Long uid);
     public long getRecentWeekUninstallCount(Long uid);
     public long getInstallCount(Long uid);

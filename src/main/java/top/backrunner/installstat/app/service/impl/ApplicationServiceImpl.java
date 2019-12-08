@@ -11,6 +11,7 @@ import top.backrunner.installstat.app.entity.InstallLogInfo;
 import top.backrunner.installstat.app.entity.UninstallLogInfo;
 import top.backrunner.installstat.app.entity.VersionInfo;
 import top.backrunner.installstat.app.exception.ApplicationNotFoundException;
+import top.backrunner.installstat.app.exception.CannotAccessAppException;
 import top.backrunner.installstat.app.exception.UninstallCountStatDisabledException;
 import top.backrunner.installstat.app.exception.VersionNotFoundException;
 import top.backrunner.installstat.app.service.ApplicationService;
@@ -50,6 +51,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public List<ApplicationInfo> getApplicationList(long uid, int page, int pageSize) {
         return applicationDao.showPage("FROM ApplicationInfo WHERE uid = "+uid, page, pageSize);
+    }
+
+    @Override
+    public long getApplicationCount() {
+        return applicationDao.countByHql("select count(*) from ApplicationInfo");
     }
 
     @Override
@@ -232,10 +238,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws ApplicationNotFoundException {
+    public boolean increaseInstallCount(String appKey, String branch, String version, String uuid, String ip) throws ApplicationNotFoundException, CannotAccessAppException {
         ApplicationInfo appInfo = applicationDao.getByAppKey(appKey);
         if (appInfo == null){
             throw new ApplicationNotFoundException();
+        }
+        if (!appInfo.isEnabled()){
+            throw new CannotAccessAppException();
         }
         long appId = appInfo.getId();
         VersionInfo v = versionDao.getVersion(appId, branch, version);
@@ -308,10 +317,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException {
+    public boolean increaseUninstallCount(String appKey, String branch, String version, String uuid, String ip) throws UninstallCountStatDisabledException, ApplicationNotFoundException, VersionNotFoundException, CannotAccessAppException {
         ApplicationInfo appInfo = applicationDao.getByAppKey(appKey);
         if (appInfo == null){
             throw new ApplicationNotFoundException();
+        }
+        if (!appInfo.isEnabled()){
+            throw new CannotAccessAppException();
         }
         if (!appInfo.isStatUninstall()){
             throw new UninstallCountStatDisabledException();
@@ -401,12 +413,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ApplicationInfo> getAllApplicationList(int pageSize, int page) {
+    public List<ApplicationInfo> getAllApplicationList(int page, int pageSize) {
         return applicationDao.showPage("FROM ApplicationInfo", page, pageSize);
     }
 
     @Override
-    public List<VersionInfo> getAllVersionList(int pageSize, int page) {
+    public List<VersionInfo> getAllVersionList(int page, int pageSize) {
         return versionDao.showPage("FROM VersionInfo", page, pageSize);
     }
 

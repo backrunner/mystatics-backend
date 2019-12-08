@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import top.backrunner.installstat.app.exception.ApplicationNotFoundException;
+import top.backrunner.installstat.app.exception.CannotAccessAppException;
 import top.backrunner.installstat.app.exception.UninstallCountStatDisabledException;
 import top.backrunner.installstat.app.exception.VersionNotFoundException;
 import top.backrunner.installstat.app.service.ApplicationService;
@@ -42,6 +43,8 @@ public class SubmitController {
             }
         } catch (ApplicationNotFoundException e) {
             return R.error("找不到该应用");
+        } catch (CannotAccessAppException e) {
+            return R.error("应用不可用");
         }
     }
 
@@ -68,6 +71,8 @@ public class SubmitController {
             return R.error("应用未启用记录卸载量");
         } catch (VersionNotFoundException e) {
             return R.error("找不到该版本");
+        } catch (CannotAccessAppException e) {
+            return R.error("应用不可用");
         }
     }
 }

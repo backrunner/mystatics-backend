@@ -2,6 +2,8 @@ package top.backrunner.installstat.system.service;
 
 import top.backrunner.installstat.system.entity.RoleInfo;
 import top.backrunner.installstat.system.entity.UserInfo;
+import top.backrunner.installstat.system.exception.CannotBanAdminException;
+import top.backrunner.installstat.system.exception.UserNotFoundException;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -22,6 +24,10 @@ public interface UserService {
     public RoleInfo initRole(String name);
     public boolean roleExists(String name);
     // 管理员管理
-    public List<Map<String, Object>> getUserList(int pageSize, int page);
-    public boolean banUser(Long id) throws EntityNotFoundException;
+    public List<Map<String, Object>> getUserList(int page, int pageSize);
+    public long getUserCount();
+    public boolean banUser(Long id) throws UserNotFoundException, CannotBanAdminException;
+    public boolean unbanUser(Long id) throws UserNotFoundException;
+    public boolean setRoleToUser(Long id) throws UserNotFoundException;
+    public boolean setRoleToAdmin(Long id) throws UserNotFoundException;
 }
