@@ -112,6 +112,9 @@ public class UserController {
     @RequestMapping(value = "/cancelAccount")
     @ResponseBody
     public R cancelAccount(String password){
+        if (!ObjectUtils.allNotNull(password)){
+            return R.badRequest("提交的参数不完整");
+        }
         UserInfo user = AuthUtils.getUser();
         String hashPassword = new SimpleHash("SHA-256", password, user.getSalt(), 32).toHex();
         if (hashPassword.equals(user.getPassword())){
