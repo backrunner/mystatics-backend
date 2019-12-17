@@ -17,6 +17,7 @@ import top.backrunner.installstat.app.exception.VersionNotFoundException;
 import top.backrunner.installstat.app.service.ApplicationService;
 import top.backrunner.installstat.utils.application.VersionUtils;
 import top.backrunner.installstat.utils.common.UUIDUtils;
+import top.backrunner.installstat.utils.filter.SQLFilter;
 import top.backrunner.installstat.utils.misc.GeoIPUtils;
 import top.backrunner.installstat.utils.misc.IPLocation;
 import top.backrunner.installstat.utils.security.AuthUtils;
@@ -158,6 +159,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public List<VersionInfo> getVersionList(Long appId, String branch) {
+        return versionDao.findByHql("FROM VersionInfo WHERE appId = "+appId + " and branch = "+SQLFilter.filter(branch));
+    }
+
+    @Override
     public List<VersionInfo> getVersionList(Long appId, int page, int pageSize) {
         return versionDao.showPage("FROM VersionInfo WHERE appId = "+appId+" order by createTime desc", page, pageSize);
     }
@@ -189,13 +195,15 @@ public class ApplicationServiceImpl implements ApplicationService {
             info.setUninstallCount(info.getUninstallCount() - version.getUninstallCount());
             // 如果应用的当前版本为被删除的版本，则自动指定一个应用版本
             Map<String, String> currentVersionMap = info.getCurrentVersion();
-            for (String currentVersion:currentVersionMap.values()){
-                if (currentVersion.equals(version.getVersion())){
-                    List<VersionInfo> versions = this.getVersionList(info.getId());
+            String cv = currentVersionMap.get(version.getBranch());
+            if (cv != null && version.getVersion().equals(cv)){
+                List<VersionInfo> versions = this.getVersionList(info.getId(), version.getBranch());
+                if (versions.size() > 0){
                     currentVersionMap.put(version.getBranch(), VersionUtils.max(versions, version.getBranch()));
-                    info.setCurrentVersion(currentVersionMap);
-                    break;
+                } else {
+                    currentVersionMap.remove(version.getBranch());
                 }
+                info.setCurrentVersion(currentVersionMap);
             }
             applicationDao.updateEntity(info);
             return true;

@@ -30,6 +30,7 @@ public interface ApplicationService {
     // Version
     public VersionInfo fetchVersion(Long versionId);
     public List<VersionInfo> getVersionList(Long appId);
+    public List<VersionInfo> getVersionList(Long appId, String branch);
     public List<VersionInfo> getVersionList(Long appId, int page, int pageSize);
     public long getVersionCount(Long uid);
     public boolean addVersion(VersionInfo info);

@@ -198,6 +198,9 @@ public class AdminController {
         if (!ObjectUtils.allNotNull(uid)) {
             return R.badRequest("提交的参数不完整");
         }
+        if (uid.equals(AuthUtils.getUserId())){
+            return R.error("不能操作自己");
+        }
         try {
             if (userService.banUser(uid)){
                 return R.ok("封禁成功");
@@ -234,6 +237,9 @@ public class AdminController {
         if (!ObjectUtils.allNotNull(role, uid)) {
             return R.badRequest("提交的参数不完整");
         }
+        if (uid.equals(AuthUtils.getUserId())){
+            return R.error("不能操作自己");
+        }
         if (!role.equals("admin") && !role.equals("user")){
             return R.badRequest("非法参数");
         }
@@ -263,11 +269,14 @@ public class AdminController {
         if (!ObjectUtils.allNotNull(uid)) {
             return R.badRequest("提交的参数不完整");
         }
+        if (uid.equals(AuthUtils.getUserId())){
+            return R.error("不能删除自己");
+        }
         UserInfo info = userService.findUserById(uid);
         if (info == null){
             return R.error("无此用户");
         }
-        if (userService.deleteUser(uid)){
+        if (applicationService.deleteApplicationByUser(info.getId()) && userService.deleteUser(uid)){
             return R.ok("删除成功");
         } else {
             return R.error("删除失败");
