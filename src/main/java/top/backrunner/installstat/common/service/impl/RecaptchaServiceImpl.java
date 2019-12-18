@@ -9,11 +9,12 @@ import top.backrunner.installstat.config.RecaptchaConfig;
 import top.backrunner.installstat.utils.network.HttpResult;
 import top.backrunner.installstat.utils.network.HttpUtils;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 
 @Service
 public class RecaptchaServiceImpl implements RecaptchaService {
-    @Autowired
+    @Resource
     private RecaptchaConfig recaptchaConfig;
 
     private final String VERIFY_URL = "https://www.recaptcha.net/recaptcha/api/siteverify";

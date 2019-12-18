@@ -14,6 +14,7 @@ import top.backrunner.installstat.system.exception.UserNotFoundException;
 import top.backrunner.installstat.system.service.SystemService;
 import top.backrunner.installstat.system.service.UserService;
 import top.backrunner.installstat.utils.common.R;
+import top.backrunner.installstat.utils.security.AuthUtils;
 
 import javax.annotation.Resource;
 import javax.validation.ReportAsSingleViolation;

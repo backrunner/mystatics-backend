@@ -27,7 +27,7 @@ public class SubmitController {
     @RequestMapping(value = "/install", method = RequestMethod.POST)
     @ResponseBody
     public R submitInstall(String appKey, String branch, String version, String uuid, HttpServletRequest req){
-        if (!ObjectUtils.allNotNull(appKey, appKey, version, uuid)){
+        if (!ObjectUtils.allNotNull(appKey, branch, version, uuid)){
             return R.badRequest("提交的参数不完整");
         }
         // 对version进行校验

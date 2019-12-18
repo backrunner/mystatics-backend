@@ -160,7 +160,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public List<VersionInfo> getVersionList(Long appId, String branch) {
-        return versionDao.findByHql("FROM VersionInfo WHERE appId = "+appId + " and branch = "+SQLFilter.filter(branch));
+        return versionDao.findByHql("FROM VersionInfo WHERE appId = "+appId + " and branch = '"+SQLFilter.filter(branch)+"'");
     }
 
     @Override
@@ -407,6 +407,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Map<String, Object>> res = new ArrayList<>();
         for (ApplicationInfo app : apps){
             Map<String, Object> map = new HashMap<>();
+            map.put("id", app.getId());
             map.put("bundleId", app.getBundleId());
             map.put("name", app.getDisplayName());
             map.put("installCount", app.getInstallCount());

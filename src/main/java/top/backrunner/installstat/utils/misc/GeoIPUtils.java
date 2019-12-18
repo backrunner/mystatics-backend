@@ -3,21 +3,23 @@ package top.backrunner.installstat.utils.misc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.util.ResourceUtils;
 import top.backrunner.installstat.InstallstatApplication;
 
-import java.io.File;
+import javax.annotation.Resource;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * IP地址服务
  */
 public class GeoIPUtils {
+
     private static Logger log = LoggerFactory.getLogger(GeoIPUtils.class);
 
     public static GeoIPUtils o = new GeoIPUtils();
@@ -25,7 +27,7 @@ public class GeoIPUtils {
     /**
      * 纯真IP数据库名
      */
-    private String IP_FILE = "geoip/qqwry.dat";
+    private String IP_FILE = "";
 
     /**
      * 常量，比如记录长度等等
@@ -95,9 +97,11 @@ public class GeoIPUtils {
             buf = new byte[100];
             b4 = new byte[4];
             b3 = new byte[3];
+            Properties properties = new Properties();
+            properties.load(new ClassPathResource("geoip/config.properties").getInputStream());
+            IP_FILE = properties.getProperty("qqwry.path");
             try {
-                Resource resource = new ClassPathResource(IP_FILE);
-                ipFile = new RandomAccessFile(resource.getFile().getAbsolutePath(), "r");
+                ipFile = new RandomAccessFile(IP_FILE, "r");
             } catch (FileNotFoundException e) {
                 throw new Exception("纯真IP库初始化失败");
             }

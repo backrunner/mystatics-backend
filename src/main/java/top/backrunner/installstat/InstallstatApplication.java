@@ -12,14 +12,14 @@ import top.backrunner.installstat.utils.misc.GeoIPUtils;
 @SpringBootApplication
 public class InstallstatApplication {
 
-    /*@Bean
+    @Bean
     public HttpMessageConverters fastJsonHttpMessageConverters() {
         FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
         fastConverter.setFastJsonConfig(fastJsonConfig);
         return new HttpMessageConverters(fastConverter);
-    }*/
+    }
 
     public static void main(String[] args) {
         // 运行服务器

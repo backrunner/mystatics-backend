@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import top.backrunner.installstat.app.dao.ApplicationDao;
 import top.backrunner.installstat.app.entity.ApplicationInfo;
 import top.backrunner.installstat.core.dao.impl.BaseDaoImpl;
-import top.backrunner.installstat.utils.security.AuthUtils;
 
 import java.util.List;
 
