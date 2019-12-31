@@ -10,7 +10,7 @@
     </parent>
     <groupId>top.backrunner</groupId>
     <artifactId>installstat</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>1.0.0-RELEASE</version>
     <name>myStatics</name>
     <description>An application to stat install count of apps</description>
 
