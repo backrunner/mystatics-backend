@@ -39,3 +39,4 @@ mvnw.cmd
 application-release.yml
 config.properties
 myStatics.log*
+/src/main/resources/application-deploy.yml

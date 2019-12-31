@@ -282,7 +282,7 @@ public class ApplicationController {
             return R.badRequest("提交的参数不完整");
         }
         List<Map<String, Object>> res = applicationService.getReport(AuthUtils.getUserId(), page, pageSize);
-        if (res.isEmpty()){
+        if (res == null || res.isEmpty()){
             return R.error("无结果");
         } else {
             Map<String, Object> data = new HashMap<>();
