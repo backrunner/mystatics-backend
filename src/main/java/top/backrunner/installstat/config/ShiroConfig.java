@@ -17,8 +17,9 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import top.backrunner.installstat.config.shiro.OptionsRequestFilter;
 import top.backrunner.installstat.config.shiro.RetryLimitCredentialsMatcher;
+import top.backrunner.installstat.config.shiro.RolesCorsFilter;
+import top.backrunner.installstat.config.shiro.UserCorsFilter;
 import top.backrunner.installstat.config.shiro.UserRealm;
 
 import javax.servlet.Filter;
@@ -88,9 +89,11 @@ public class ShiroConfig {
         return securityManager;
     }
 
-    public OptionsRequestFilter optionsRequestFilter(){
-        return new OptionsRequestFilter();
+    public UserCorsFilter userCorsFilter(){
+        return new UserCorsFilter();
     }
+
+    public RolesCorsFilter rolesCorsFilter() { return new RolesCorsFilter(); }
 
     @Bean({"shiroFilter"})
     public ShiroFilterFactoryBean shiroFilter(SecurityManager securityManager) {
@@ -99,20 +102,22 @@ public class ShiroConfig {
         // 配置unauth跳转
         shiroFilter.setLoginUrl("/error/unauth");
         shiroFilter.setUnauthorizedUrl("/error/unauth");
+        // 自定义过滤器
+        Map<String, Filter> filterMap = new LinkedHashMap<>();
+        filterMap.put("user", userCorsFilter());
+        filterMap.put("roles", rolesCorsFilter());
+        shiroFilter.setFilters(filterMap);
         // 配置不会被拦截的api
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/portal/**", "anon");
         filterChainDefinitionMap.put("/captcha/**", "anon");
-        filterChainDefinitionMap.put("/druid/**", "anon");
+        filterChainDefinitionMap.put("/error/**", "anon");
         filterChainDefinitionMap.put("/submit/**", "anon");
+        filterChainDefinitionMap.put("/druid/**", "roles[admin]");
         filterChainDefinitionMap.put("/admin/**", "roles[admin]");
         // 对应的是user拦截器，支持rememberMe
-        filterChainDefinitionMap.put("/**", "optionsRequestFilter");
+        filterChainDefinitionMap.put("/**", "user");
         shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMap);
-        // 自定义过滤器
-        Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("optionsRequestFilter", optionsRequestFilter());
-        shiroFilter.setFilters(filterMap);
         return shiroFilter;
     }
 

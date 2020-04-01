@@ -19,7 +19,7 @@ public class UserLoginLogDaoImpl extends BaseDaoImpl<UserLoginLogInfo> implement
     @Override
     public List<UserLoginLogInfo> getLimitedList(Long uid, int limited) {
         Session session = this.getHibernateSession();
-        Query<UserLoginLogInfo> query = session.createQuery("FROM UserLoginLogInfo WHERE uid = "+uid+"order by createTime desc");
+        Query<UserLoginLogInfo> query = session.createQuery("FROM UserLoginLogInfo WHERE uid = "+uid+" order by createTime desc");
         query.setMaxResults(limited);
         return query.list();
     }

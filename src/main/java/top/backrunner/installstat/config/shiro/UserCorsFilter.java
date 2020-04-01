@@ -2,6 +2,7 @@ package top.backrunner.installstat.config.shiro;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.shiro.web.filter.authc.UserFilter;
+import org.apache.shiro.web.util.WebUtils;
 import top.backrunner.installstat.utils.common.R;
 
 import javax.servlet.ServletRequest;
@@ -10,9 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class OptionsRequestFilter extends UserFilter {
+public class UserCorsFilter extends UserFilter {
     @Override
-    public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue){
+    public boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         if ("OPTIONS".equals(((HttpServletRequest)request).getMethod().toUpperCase())){
             return true;
         }
