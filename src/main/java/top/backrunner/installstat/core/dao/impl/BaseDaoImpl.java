@@ -71,6 +71,16 @@ public abstract class BaseDaoImpl<T> implements BaseDao<T> {
     }
 
     @Override
+    public long removeEntitiesByHql(String hql) {
+        try {
+            return this.executeHql(hql);
+        } catch (Exception e){
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    @Override
     public long countByHql(String hql) {
         try{
             return (Long)this.getHibernateSession().createQuery(hql).setMaxResults(1).uniqueResult();

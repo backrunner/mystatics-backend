@@ -33,6 +33,7 @@ public interface BaseDao<T> {
     // 删除一个实体
     <T> boolean removeEntity(T entity);
     boolean removeByHql(String hql);
+    long removeEntitiesByHql(String hql);
     // 根据ID获取一个实体
     <T> T getById(Class<T> clazz, int id);
     <T> T getById(Class<T> clazz, String id);

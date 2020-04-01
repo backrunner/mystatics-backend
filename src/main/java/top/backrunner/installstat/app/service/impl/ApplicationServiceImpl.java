@@ -100,7 +100,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public boolean deleteApplicationByUser(Long uid) {
         this.deleteVersionByUser(uid);
-        return applicationDao.removeByHql("DELETE FROM ApplicationInfo WHERE uid = "+uid);
+        return applicationDao.removeEntitiesByHql("DELETE FROM ApplicationInfo WHERE uid = "+uid) >= 0;
     }
 
     @Override
