@@ -35,6 +35,7 @@ mvnw
 mvnw.cmd
 
 *.log
+logs
 
 application-release.yml
 config.properties
