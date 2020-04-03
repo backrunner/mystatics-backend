@@ -1,8 +1,6 @@
 package top.backrunner.installstat.utils.security;
 
-import org.apache.catalina.User;
 import org.apache.shiro.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import top.backrunner.installstat.system.entity.UserInfo;
 import top.backrunner.installstat.system.service.UserService;

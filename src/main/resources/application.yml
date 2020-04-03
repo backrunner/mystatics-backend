@@ -1,8 +1,7 @@
 server:
-  tomcat:
-    uri-encoding: UTF-8
-    max-threads: 100
-    min-spare-threads: 20
+  undertow:
+    io-threads: 2
+    max-http-post-size: 2MB
   servlet:
     context-path: /
 spring:
@@ -17,8 +16,8 @@ spring:
     time-zone: GMT+8
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 2MB
+      max-request-size: 2MB
   jpa:
     database: MYSQL
     generate-ddl: true
