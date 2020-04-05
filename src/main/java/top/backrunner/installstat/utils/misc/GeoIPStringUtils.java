@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -104,5 +106,12 @@ public class GeoIPStringUtils {
             ip = request.getRemoteAddr();
         }
         return ip;
+    }
+
+    // 验证是否为IPv4地址
+    private static Pattern ipv4_pattern = Pattern.compile("^((25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.){3}(25[0-5]|2[0-4]\\d|[01]?\\d\\d?)$");
+    public static boolean isIPv4(String ip) {
+        Matcher matcher = ipv4_pattern.matcher(ip);
+        return matcher.find();
     }
 }

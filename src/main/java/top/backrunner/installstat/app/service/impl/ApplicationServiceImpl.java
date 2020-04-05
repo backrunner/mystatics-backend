@@ -18,6 +18,7 @@ import top.backrunner.installstat.app.service.ApplicationService;
 import top.backrunner.installstat.utils.application.VersionUtils;
 import top.backrunner.installstat.utils.common.UUIDUtils;
 import top.backrunner.installstat.utils.filter.SQLFilter;
+import top.backrunner.installstat.utils.misc.GeoIPStringUtils;
 import top.backrunner.installstat.utils.misc.GeoIPUtils;
 import top.backrunner.installstat.utils.misc.IPLocation;
 import top.backrunner.installstat.utils.security.AuthUtils;
@@ -447,8 +448,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         info.setCreateTime(new Date());
         info.setAppId(appId);
         info.setVersionId(versionId);
-        IPLocation location = GeoIPUtils.o.getIPLocation(ip);
-        info.setGeo(location.toString());
+        if (GeoIPStringUtils.isIPv4(ip)) {
+            IPLocation location = GeoIPUtils.o.getIPLocation(ip);
+            info.setGeo(location.toString());
+        }
         info.setUuid(uuid);
         return installLogDao.add(info);
     }
@@ -459,8 +462,10 @@ public class ApplicationServiceImpl implements ApplicationService {
         info.setCreateTime(new Date());
         info.setAppId(appId);
         info.setVersionId(versionId);
-        IPLocation location = GeoIPUtils.o.getIPLocation(ip);
-        info.setGeo(location.toString());
+        if (GeoIPStringUtils.isIPv4(ip)) {
+            IPLocation location = GeoIPUtils.o.getIPLocation(ip);
+            info.setGeo(location.toString());
+        }
         info.setUuid(uuid);
         return uninstallLogDao.add(info);
     }

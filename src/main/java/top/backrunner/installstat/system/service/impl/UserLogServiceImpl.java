@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import top.backrunner.installstat.system.dao.UserLoginLogDao;
 import top.backrunner.installstat.system.entity.log.UserLoginLogInfo;
 import top.backrunner.installstat.system.service.UserLogService;
+import top.backrunner.installstat.utils.misc.GeoIPStringUtils;
 import top.backrunner.installstat.utils.misc.GeoIPUtils;
 
 import javax.annotation.Resource;
@@ -31,7 +32,9 @@ public class UserLogServiceImpl implements UserLogService {
         log.setCreateTime(new Date());
         log.setUid(uid);
         log.setIp(ip);
-        log.setGeo(GeoIPUtils.o.getIPLocation(ip).toString());
+        if (GeoIPStringUtils.isIPv4(ip)) {
+            log.setGeo(GeoIPUtils.o.getIPLocation(ip).toString());
+        }
         userLoginLogDao.add(log);
     }
 
