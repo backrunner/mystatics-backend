@@ -19,12 +19,23 @@ import java.util.Map;
 public class InstallLogDaoImpl extends BaseDaoImpl<InstallLogInfo> implements InstallLogDao {
     @Override
     public boolean logExists(Long appId, Long vid, String uuid) {
-        return this.countByHql("select count(*) from InstallLogInfo where appId="+appId+" and versionId="+vid+" and uuid='"+ SQLFilter.filter(uuid) +"'") > 0;
+        Session session = this.getHibernateSession();
+        Query query = session.createQuery("select count(*) from InstallLogInfo where appId=:appId and versionId=:vid and uuid=:uuid");
+        query.setParameter("appId", appId);
+        query.setParameter("vid", vid);
+        query.setParameter("uuid", uuid);
+        query.setMaxResults(1);
+        return ((Long) query.uniqueResult()) > 0;
     }
 
     @Override
     public boolean logExists(Long appId, String uuid) {
-        return this.countByHql("select count(*) from InstallLogInfo where appId="+appId+" and uuid = '"+SQLFilter.filter(uuid)+"'") > 0;
+        Session session = this.getHibernateSession();
+        Query query = session.createQuery("select count(*) from InstallLogInfo where appId=:appId and uuid = :uuid");
+        query.setParameter("appId", appId);
+        query.setParameter("uuid", uuid);
+        query.setMaxResults(1);
+        return ((Long) query.uniqueResult()) > 0;
     }
 
     @Override
